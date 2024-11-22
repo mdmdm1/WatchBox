@@ -1,11 +1,13 @@
-import React from "react";
+import { Button } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
-const WatchedPage = () => {
+import React from "react";
+const MoviesPage = () => {
   return (
-    <>
-      <div>WatchedPage</div>
-    </>
+    <div>
+      <Button>New Movie</Button>
+    </div>
   );
 };
 
-export default WatchedPage;
+export default MoviesPage;

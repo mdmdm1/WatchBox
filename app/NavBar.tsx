@@ -4,11 +4,12 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { RiMovie2Line } from "react-icons/ri";
 import classnames from "classnames";
+
 const NavBar = () => {
   const currentPath = usePathname();
   const links = [
     { label: "Dashboard", href: "/" },
-    { label: "Watched", href: "/watched" },
+    { label: "Movies", href: "/movies" },
   ];
 
   return (
