@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createMovieSchema } from "@/app/validationSchemas";
 import { z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
+import Spinner from "@/app/components/Spinner";
 
 type MovieForm = z.infer<typeof createMovieSchema>;
 
@@ -23,6 +24,8 @@ const NewMoviePage = () => {
     resolver: zodResolver(createMovieSchema),
   });
   const [error, setError] = useState("");
+  const [isSubmitting, setSubmitting] = useState(false);
+
   return (
     <div className="max-w-xl">
       {error && (
@@ -34,9 +37,11 @@ const NewMoviePage = () => {
         className=" space-y-3"
         onSubmit={handleSubmit(async (data) => {
           try {
+            setSubmitting(true);
             await axios.post("/api/movies", data);
             router.push("/movies");
           } catch (error) {
+            setSubmitting(false);
             setError("An unexcepted error occured.");
           }
         })}
@@ -47,7 +52,9 @@ const NewMoviePage = () => {
           {...register("title")}
         />
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
-        <Button>Submit New Movie</Button>
+        <Button disabled={isSubmitting}>
+          Submit New Movie {isSubmitting && <Spinner />}
+        </Button>
       </form>
     </div>
   );
