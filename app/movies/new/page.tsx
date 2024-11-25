@@ -1,19 +1,26 @@
 "use client";
 
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Button, Callout, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
 // import "@radix-ui/themes/styles.css";
 import axios from "axios";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createMovieSchema } from "@/app/validationSchemas";
+import { z } from "zod";
 
-interface MovieForm {
-  title: string;
-}
+type IssueForm = z.infer<typeof createMovieSchema>;
 
 const NewMoviePage = () => {
   const router = useRouter();
-  const { register, handleSubmit } = useForm<MovieForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<MovieForm>({
+    resolver: zodResolver(createMovieSchema),
+  });
   const [error, setError] = useState("");
   return (
     <div className="max-w-xl">
@@ -38,6 +45,11 @@ const NewMoviePage = () => {
           placeholder="Title"
           {...register("title")}
         />
+        {errors.title && (
+          <Text color="red" as="p">
+            {errors.title.message}
+          </Text>
+        )}
         <Button>Submit New Movie</Button>
       </form>
     </div>
