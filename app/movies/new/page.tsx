@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createMovieSchema } from "@/app/validationSchemas";
 import { z } from "zod";
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 type MovieForm = z.infer<typeof createMovieSchema>;
 
@@ -45,11 +46,7 @@ const NewMoviePage = () => {
           placeholder="Title"
           {...register("title")}
         />
-        {errors.title && (
-          <Text color="red" as="p">
-            {errors.title.message}
-          </Text>
-        )}
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Button>Submit New Movie</Button>
       </form>
     </div>
