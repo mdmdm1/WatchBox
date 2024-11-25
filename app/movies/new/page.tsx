@@ -26,6 +26,16 @@ const NewMoviePage = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
 
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setSubmitting(true);
+      await axios.post("/api/movies", data);
+      router.push("/movies");
+    } catch (error) {
+      setSubmitting(false);
+      setError("An unexcepted error occured.");
+    }
+  });
   return (
     <div className="max-w-xl">
       {error && (
@@ -33,19 +43,7 @@ const NewMoviePage = () => {
           <Callout.Text>{error}</Callout.Text>
         </Callout.Root>
       )}
-      <form
-        className=" space-y-3"
-        onSubmit={handleSubmit(async (data) => {
-          try {
-            setSubmitting(true);
-            await axios.post("/api/movies", data);
-            router.push("/movies");
-          } catch (error) {
-            setSubmitting(false);
-            setError("An unexcepted error occured.");
-          }
-        })}
-      >
+      <form className=" space-y-3" onSubmit={onSubmit}>
         <TextField.Root
           radius="large"
           placeholder="Title"
