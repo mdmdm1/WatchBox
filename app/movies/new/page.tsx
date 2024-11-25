@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createMovieSchema } from "@/app/validationSchemas";
 import { z } from "zod";
 
-type IssueForm = z.infer<typeof createMovieSchema>;
+type MovieForm = z.infer<typeof createMovieSchema>;
 
 const NewMoviePage = () => {
   const router = useRouter();
