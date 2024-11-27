@@ -15,7 +15,13 @@ import Spinner from "@/app/components/Spinner";
 type MovieForm = z.infer<typeof createMovieSchema>;
 
 const NewMoviePage = () => {
-  const router = useRouter();
+  return (
+    <div>
+      <TextField.Root placeholder="Search for a movie..." />
+      <Button>Search for the movie</Button>
+    </div>
+  );
+  /* const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -55,7 +61,7 @@ const NewMoviePage = () => {
         </Button>
       </form>
     </div>
-  );
+  ); */
 };
 
 export default NewMoviePage;
