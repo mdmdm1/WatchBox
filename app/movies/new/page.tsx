@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Callout, Text, TextField } from "@radix-ui/themes";
+import { Button, Callout, Grid, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
 // import "@radix-ui/themes/styles.css";
 import axios from "axios";
@@ -11,17 +11,53 @@ import { createMovieSchema } from "@/app/validationSchemas";
 import { z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
+// import handler from "@/app/api/omdb/route";
+import { env } from "process";
+import { register } from "module";
 
 type MovieForm = z.infer<typeof createMovieSchema>;
 
+interface Movie {
+  id: number;
+  title: string;
+  poster_path: string;
+  release_date: string;
+}
 const NewMoviePage = () => {
+  const [title, setTitle] = useState("");
+  const [movie, setMovies] = useState<Movie[]>([]);
+  const { register, handleSubmit } = useForm<MovieForm>({
+    resolver: zodResolver(createMovieSchema),
+  });
+
+  const SearchMovie = async (data: MovieForm) => {
+    try {
+      const response = await axios.get(
+        `/api/movies/search?title=${data.title}`
+      );
+      //setMovies(response.data.results);
+      console.log(response.data.results);
+    } catch (error) {
+      console.error("Error adding movie:", error);
+    }
+  };
   return (
     <div>
-      <TextField.Root placeholder="Search for a movie..." />
-      <Button>Search for the movie</Button>
+      <form className="mb-4" onSubmit={handleSubmit(SearchMovie)}>
+        <TextField.Root
+          {...register("title")}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Search for a movie..."
+        />
+        <Button>Search</Button>
+      </form>
+
+      <Grid columns="3">{}</Grid>
     </div>
   );
-  /* const router = useRouter();
+};
+/* const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -61,7 +97,7 @@ const NewMoviePage = () => {
         </Button>
       </form>
     </div>
-  ); */
-};
+  ); 
+};*/
 
 export default NewMoviePage;

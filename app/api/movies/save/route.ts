@@ -1,6 +1,6 @@
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { createMovieSchema } from "../../validationSchemas";
+import { createMovieSchema } from "../../../validationSchemas";
 
 
 export async function POST(request: NextRequest)
