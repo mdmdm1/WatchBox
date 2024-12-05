@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Callout, Grid, Text, TextField } from "@radix-ui/themes";
+import { Button, Callout, Card, Grid, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
 // import "@radix-ui/themes/styles.css";
 import axios from "axios";
@@ -25,35 +25,64 @@ interface Movie {
 }
 const NewMoviePage = () => {
   const [title, setTitle] = useState("");
-  const [movie, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const { register, handleSubmit } = useForm<MovieForm>({
     resolver: zodResolver(createMovieSchema),
   });
-
+  const [isSubmitting, setSubmitting] = useState(false);
   const SearchMovie = async (data: MovieForm) => {
+    setSubmitting(true);
     try {
       const response = await axios.get(
         `/api/movies/search?title=${data.title}`
       );
-      //setMovies(response.data.results);
-      console.log(response.data.results);
+      setMovies(response.data.results);
     } catch (error) {
       console.error("Error adding movie:", error);
     }
+    setSubmitting(false);
   };
+
+  const addMovieTowatchList = async (movie: Movie) => {
+    try {
+      const result = axios.post("/api/movies/save", movie);
+    } catch (error) {
+      console.error("Error adding movie", error);
+    }
+  };
+
   return (
-    <div>
-      <form className="mb-4" onSubmit={handleSubmit(SearchMovie)}>
+    <div className="max-w-xs">
+      <form className="mb-4 space-y-3" onSubmit={handleSubmit(SearchMovie)}>
         <TextField.Root
           {...register("title")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Search for a movie..."
         />
-        <Button>Search</Button>
+        <Button disabled={isSubmitting}>
+          {isSubmitting && <Spinner />}Search
+        </Button>
       </form>
 
-      <Grid columns="3">{}</Grid>
+      <Grid columns="3" gap="3">
+        {movies.map((movie) => (
+          <Card key={movie.id} className=" p-3">
+            <img
+              src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+              alt={movie.title}
+              className="w-auto h-auto mb-2"
+            />
+            <div>
+              <h3 color="#86EAD4" className=" font-bold">
+                {movie.title}
+              </h3>
+              <p>Release: {movie.release_date}</p>
+              <Button className="mt-2">Add to watchlist</Button>
+            </div>
+          </Card>
+        ))}
+      </Grid>
     </div>
   );
 };
