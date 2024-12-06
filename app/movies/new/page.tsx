@@ -8,29 +8,41 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createMovieSchema } from "@/app/validationSchemas";
-import { z } from "zod";
+import { EnumLike, z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
 // import handler from "@/app/api/omdb/route";
 import { env } from "process";
 import { register } from "module";
 
+export const searchMovieSchema = z.object({
+  title: z.string().min(1, "Title is required.").max(255),
+});
+
+type SearchMovieForm = z.infer<typeof searchMovieSchema>;
+
 type MovieForm = z.infer<typeof createMovieSchema>;
 
+enum Watchstatus {
+  TO_WATCH = "TO_WATCH",
+  IN_PROGRESS = "IN_PROGRESS",
+  WATCHED = "WATCHED",
+}
 interface Movie {
   id: number;
   title: string;
   poster_path: string;
   release_date: string;
+  status?: Watchstatus;
 }
 const NewMoviePage = () => {
   const [title, setTitle] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
-  const { register, handleSubmit } = useForm<MovieForm>({
-    resolver: zodResolver(createMovieSchema),
+  const { register, handleSubmit } = useForm<SearchMovieForm>({
+    resolver: zodResolver(searchMovieSchema),
   });
   const [isSubmitting, setSubmitting] = useState(false);
-  const SearchMovie = async (data: MovieForm) => {
+  const SearchMovie = async (data: SearchMovieForm) => {
     setSubmitting(true);
     try {
       const response = await axios.get(
@@ -43,46 +55,81 @@ const NewMoviePage = () => {
     setSubmitting(false);
   };
 
-  const addMovieTowatchList = async (movie: Movie) => {
+  const addMovieTowatchList = async (movie: Movie, status: Watchstatus) => {
     try {
-      const result = axios.post("/api/movies/save", movie);
+      const movieToSave = { ...movie, status };
+      const result = axios.post("/api/movies/save", movieToSave);
+      alert(`Added ${movie.title} with status: ${status}`);
     } catch (error) {
       console.error("Error adding movie", error);
     }
   };
 
   return (
-    <div className="max-w-xs">
-      <form className="mb-4 space-y-3" onSubmit={handleSubmit(SearchMovie)}>
+    <div className="max-w-2xl mx-auto p-4">
+      <form className="mb-4 flex gap-2" onSubmit={handleSubmit(SearchMovie)}>
         <TextField.Root
           {...register("title")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Search for a movie..."
+          className="flex-grow p-2 border rounded"
         />
-        <Button disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className=" text-white px-4 py-2 rounded hover:bg-teal-700"
+        >
           {isSubmitting && <Spinner />}Search
         </Button>
       </form>
 
-      <Grid columns="3" gap="3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap=4">
         {movies.map((movie) => (
-          <Card key={movie.id} className=" p-3">
-            <img
-              src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-              alt={movie.title}
-              className="w-auto h-auto mb-2"
-            />
-            <div>
-              <h3 color="#86EAD4" className=" font-bold">
-                {movie.title}
-              </h3>
-              <p>Release: {movie.release_date}</p>
-              <Button className="mt-2">Add to watchlist</Button>
+          <Card
+            key={movie.id}
+            className=" p-3 flex flex-col items-center justify-between text-center"
+          >
+            {movie.poster_path && (
+              <img
+                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                alt={movie.title}
+                className="w-full h-auto object-cover rounded mb-3"
+              />
+            )}
+            <div className="p-3 text-center">
+              <h3 className="font-bold text-lg mb-2">{movie.title}</h3>
+              <p className="text-sm mb-2">Release: {movie.release_date}</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button
+                  onClick={() =>
+                    addMovieTowatchList(movie, Watchstatus.TO_WATCH)
+                  }
+                  className="flex-1 !bg-blue-400 !text-white py-1 px-2 rounded hover:bg-blue-600"
+                >
+                  To watch
+                </Button>
+                <Button
+                  onClick={() =>
+                    addMovieTowatchList(movie, Watchstatus.IN_PROGRESS)
+                  }
+                  className="flex-1 !bg-yellow-500 !text-white py-1 px-2 rounded hover:bg-yellow-600"
+                >
+                  Watching now
+                </Button>
+                <Button
+                  onClick={() =>
+                    addMovieTowatchList(movie, Watchstatus.WATCHED)
+                  }
+                  className="flex-1 !bg-green-500 !text-white py-1 px-2 rounded hover:bg-green-600"
+                >
+                  Watched
+                </Button>
+              </div>
             </div>
           </Card>
         ))}
-      </Grid>
+      </div>
     </div>
   );
 };
