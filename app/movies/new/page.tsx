@@ -2,7 +2,6 @@
 
 import { Button, Callout, Card, Grid, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
-// import "@radix-ui/themes/styles.css";
 import axios from "axios";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,17 +10,12 @@ import { createMovieSchema } from "@/app/validationSchemas";
 import { EnumLike, z } from "zod";
 import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
-// import handler from "@/app/api/omdb/route";
-import { env } from "process";
-import { register } from "module";
 
 export const searchMovieSchema = z.object({
   title: z.string().min(1, "Title is required.").max(255),
 });
 
 type SearchMovieForm = z.infer<typeof searchMovieSchema>;
-
-type MovieForm = z.infer<typeof createMovieSchema>;
 
 enum Watchstatus {
   TO_WATCH = "TO_WATCH",
@@ -36,6 +30,7 @@ interface Movie {
   status?: Watchstatus;
 }
 const NewMoviePage = () => {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [movies, setMovies] = useState<Movie[]>([]);
   const { register, handleSubmit } = useForm<SearchMovieForm>({
@@ -59,7 +54,7 @@ const NewMoviePage = () => {
     try {
       const movieToSave = { ...movie, status };
       const result = axios.post("/api/movies/save", movieToSave);
-      alert(`Added ${movie.title} with status: ${status}`);
+      router.push("/movies");
     } catch (error) {
       console.error("Error adding movie", error);
     }
@@ -78,7 +73,7 @@ const NewMoviePage = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className=" text-white px-4 py-2 rounded hover:bg-teal-700"
+          className=" text-white px-4 py-2 rounded hover:bg-cyan-700"
         >
           {isSubmitting && <Spinner />}Search
         </Button>
@@ -105,7 +100,7 @@ const NewMoviePage = () => {
                   onClick={() =>
                     addMovieTowatchList(movie, Watchstatus.TO_WATCH)
                   }
-                  className="flex-1 !bg-blue-400 !text-white py-1 px-2 rounded hover:bg-blue-600"
+                  className="flex-1 !bg-blue-400 !text-white py-1 px-2 rounded hover:!bg-blue-800"
                 >
                   To watch
                 </Button>
@@ -113,7 +108,7 @@ const NewMoviePage = () => {
                   onClick={() =>
                     addMovieTowatchList(movie, Watchstatus.IN_PROGRESS)
                   }
-                  className="flex-1 !bg-yellow-500 !text-white py-1 px-2 rounded hover:bg-yellow-600"
+                  className="flex-1 !bg-yellow-500 !text-white py-1 px-2 rounded hover:!bg-yellow-600"
                 >
                   Watching now
                 </Button>
@@ -121,7 +116,7 @@ const NewMoviePage = () => {
                   onClick={() =>
                     addMovieTowatchList(movie, Watchstatus.WATCHED)
                   }
-                  className="flex-1 !bg-green-500 !text-white py-1 px-2 rounded hover:bg-green-600"
+                  className="flex-1 !bg-green-500 !text-white py-1 px-2 rounded hover:!bg-green-600"
                 >
                   Watched
                 </Button>
