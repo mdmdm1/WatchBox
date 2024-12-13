@@ -53,10 +53,11 @@ const NewMoviePage = () => {
   const addMovieTowatchList = async (movie: Movie, status: Watchstatus) => {
     try {
       const movieToSave = { ...movie, status };
-      const result = axios.post("/api/movies/save", movieToSave);
+      await axios.post("/api/movies/save", movieToSave);
       router.push("/movies");
     } catch (error) {
       console.error("Error adding movie", error);
+      alert("Failed to save the movie. Please try again.");
     }
   };
 
@@ -80,54 +81,57 @@ const NewMoviePage = () => {
       </form>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap=4">
-        {movies.map((movie) => (
-          <Card
-            key={movie.id}
-            className=" p-3 flex flex-col items-center justify-between text-center"
-          >
-            {movie.poster_path && (
-              <img
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full h-auto object-cover rounded mb-3"
-              />
-            )}
-            <div className="p-3 text-center">
-              <h3 className="font-bold text-lg mb-2">{movie.title}</h3>
-              <p className="text-sm mb-2">Release: {movie.release_date}</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button
-                  onClick={() =>
-                    addMovieTowatchList(movie, Watchstatus.TO_WATCH)
-                  }
-                  className="flex-1 !bg-blue-400 !text-white py-1 px-2 rounded hover:!bg-blue-800"
-                >
-                  To watch
-                </Button>
-                <Button
-                  onClick={() =>
-                    addMovieTowatchList(movie, Watchstatus.IN_PROGRESS)
-                  }
-                  className="flex-1 !bg-yellow-500 !text-white py-1 px-2 rounded hover:!bg-yellow-600"
-                >
-                  Watching now
-                </Button>
-                <Button
-                  onClick={() =>
-                    addMovieTowatchList(movie, Watchstatus.WATCHED)
-                  }
-                  className="flex-1 !bg-green-500 !text-white py-1 px-2 rounded hover:!bg-green-600"
-                >
-                  Watched
-                </Button>
+        {movies &&
+          movies.map((movie) => (
+            <Card
+              key={movie.id}
+              className=" p-3 flex flex-col items-center justify-between text-center"
+            >
+              {movie.poster_path && (
+                <img
+                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                  alt={movie.title}
+                  className="w-full h-auto object-cover rounded mb-3"
+                />
+              )}
+              <div className="p-3 text-center">
+                <h3 className="font-bold text-lg mb-2">{movie.title}</h3>
+                <p className="text-sm mb-2">Release: {movie.release_date}</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    onClick={() =>
+                      addMovieTowatchList(movie, Watchstatus.TO_WATCH)
+                    }
+                    className="flex-1 !bg-blue-400 !text-white py-1 px-2 rounded hover:!bg-blue-800"
+                  >
+                    To watch
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      addMovieTowatchList(movie, Watchstatus.IN_PROGRESS)
+                    }
+                    className="flex-1 !bg-yellow-500 !text-white py-1 px-2 rounded hover:!bg-yellow-600"
+                  >
+                    Watching now
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      addMovieTowatchList(movie, Watchstatus.WATCHED)
+                    }
+                    className="flex-1 !bg-green-500 !text-white py-1 px-2 rounded hover:!bg-green-600"
+                  >
+                    Watched
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))}
       </div>
     </div>
   );
 };
+export default NewMoviePage;
+
 /* const router = useRouter();
   const {
     register,
@@ -170,5 +174,3 @@ const NewMoviePage = () => {
     </div>
   ); 
 };*/
-
-export default NewMoviePage;

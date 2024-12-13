@@ -7,7 +7,7 @@ export async function GET(req: NextRequest){
     const {searchParams}  = new URL(req.url)
     const status = searchParams.get("status")
     if (!status) {
-        return NextResponse.json({ error: "Title is required" }, { status: 400 });
+        return NextResponse.json({ error: "Status is required" }, { status: 400 });
     }
 
     try {
